@@ -1,64 +1,87 @@
 import React, { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getData } from "google-token-decode"
-import { GoogleLogin, useGoogleLogin } from "@react-oauth/google"
+import { getData } from "google-token-decode";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
+import { toast, ToastPromiseParams } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { wait } from "@testing-library/user-event/dist/utils";
+
 export default function Signin() {
   const [state, setState] = useState({
     invalidinpute:
       "border-gray-300 text-gray-900 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:border-blue-600",
     invalidelabel:
-      "text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500"
+      "text-gray-500 dark:text-gray-400 peer-focus:text-blue-600 peer-focus:dark:text-blue-500",
   });
   const emailuser = useRef();
   const password = useRef();
   const navigate = useNavigate();
+  const toastId = React.useRef(null);
+
   async function send() {
+  
+    // toast.update(toastId, {
+    //   render: "New content",
+    //   type: toast.TYPE.DEFAULT,
+    //   autoClose: 5000,
+    // });
+    const resolveAfter3Sec = new Promise(resolve => setTimeout(resolve, 3000));
+
+    
     let req;
     let data;
     if (validateEmailUsername(emailuser.current.value)) {
       if (String(emailuser.current.value).includes("@")) {
-        req = { email: emailuser.current.value, password: password.current.value };
-      } else {
-        req = { username: emailuser.current.value, password: password.current.value };
+        req = {
+          email: emailuser.current.value,
+          password: password.current.value,
+        };
       }
       data = await axios.post(
         "https://simpleapi-p29y.onrender.com/student/signin",
-        req,{
-          headers:{
-            "Content-Type":"application/x-www-form-urlencoded"    
-          }
+        req,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }
       );
-      console.log(data.data);
+
       if (data.data.res) {
-        navigate("/home", { state: req })
+        navigate("/home", { state: req });
+      } else {
+        
+     
+        toast.error(data.data.mes, {
+          position: toast.POSITION.TOP_RIGHT
+        })
       }
     }
-  };
+  }
   const login = useGoogleLogin({
-    onSuccess: tokenResponse => {
+    onSuccess: (tokenResponse) => {
       getData(tokenResponse.access_token, (err, data) => {
         // your logic here
         if (err) {
           return false;
         }
         async function send2() {
-          let req = { email: data.email, password: "" }
-          let res
+          let req = { email: data.email, password: "" };
+          let res;
           res = await axios.post(
             "http://localhost/SERVICE/photoshop/src/signin/signin.php",
             req
           );
           if (!res.data.res && res.data.mes.includes("email dont exist!")) {
-            navigate("../signup")
-          }else{
-            navigate("/home", { state: { googlelog: true } })
+            navigate("../signup");
+          } else {
+            navigate("/home", { state: { googlelog: true } });
           }
         }
-        send2()
+        send2();
       });
-    }
+    },
   });
   function validateEmailUsername(email) {
     return (
@@ -71,7 +94,7 @@ export default function Signin() {
         .toLowerCase()
         .match(/^[a-z0-9_]+$/)
     );
-  };
+  }
   function handle(e) {
     let value = e.target.value;
     if (validateEmailUsername(value) || value == "") {
@@ -90,7 +113,7 @@ export default function Signin() {
           "border-red-500 text-red-600 dark:text-red focus:border-red-600",
       }));
     }
-  };
+  }
   return (
     <div className="flex items-center justify-center">
       <div className="w-5/6 md:w-3/5">
@@ -142,10 +165,18 @@ export default function Signin() {
             Forget password
           </a>
         </div>
-        <button onClick={send} className="w-full mt-6 mb-3 bg-purple-500 rounded-md h-10 text-white font-serif">
+        <button
+          onClick={() => {
+            send();
+          }}
+          className="w-full mt-6 mb-3 bg-purple-500 rounded-md h-10 text-white font-serif"
+        >
           Sign in
         </button>
-        <button onClick={() => login()} className="w-full border border-slate-300 py-1 rounded-md font-serif flex justify-center items-center dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600">
+        <button
+          onClick={() => login()}
+          className="w-full border border-slate-300 py-1 rounded-md font-serif flex justify-center items-center dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600"
+        >
           <img
             className="h-8 w-8 mr-5"
             src="https://cdn-icons-png.flaticon.com/512/2702/2702602.png"
@@ -161,9 +192,7 @@ export default function Signin() {
           }}
         /> */}
         <div className="flex justify-center mt-5">
-          <p className="font-serif dark:text-white">
-            if dont have an account?
-          </p>
+          <p className="font-serif dark:text-white">if dont have an account?</p>
           <Link
             to={"../signup"}
             className="pl-1 text-purple-900 font-serif dark:text-purple-500"

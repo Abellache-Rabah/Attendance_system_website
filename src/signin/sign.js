@@ -1,4 +1,10 @@
 import React from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+
+
 import {
   Route,
   Routes,
@@ -15,13 +21,9 @@ export default function Sign() {
           <Route path="*" element={<Navigate to={"signin"} replace />} />
         </Routes>
         <div className="bg-gray-100 hidden md:flex justify-center items-center dark:bg-slate-400">
-          <div className="h-60 w-60 rounded-full bg-purple-700 grid grid-cols-1 grid-rows-2">
-            <div></div>
-            <div className="relative">
-              <div className="backdrop-blur-md absolute top-1/2 left-1/2 w-80 h-40 -translate-x-1/2 -translate-y-1/3"></div>
-            </div>
-          </div>
+          <img src="./img/hero.jpg" ></img>
         </div>
+      <ToastContainer />
       </div>
   )
 }
