@@ -1,7 +1,7 @@
 import React from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import logo from "./nobgsh.png"
 
 
 
@@ -21,7 +21,7 @@ export default function Sign() {
           <Route path="*" element={<Navigate to={"signin"} replace />} />
         </Routes>
         <div className="bg-gray-100 hidden md:flex justify-center items-center dark:bg-slate-400">
-          <img src="./img/hero.jpg" ></img>
+          <img src={logo} ></img>
         </div>
       <ToastContainer />
       </div>

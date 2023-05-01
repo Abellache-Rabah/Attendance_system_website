@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { getData } from "google-token-decode";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function Signup(params) {
   const [state, setState] = useState({
     validateusername: [
@@ -43,6 +46,7 @@ export default function Signup(params) {
   const fname = useRef();
   const lname = useRef();
   const tel = useRef();
+  const sp = useRef();
   const code = useRef();
   const company = useRef();
   const navigate = useNavigate();
@@ -50,15 +54,33 @@ export default function Signup(params) {
     let res;
     let req = { email: email.current.value };
 
-    res = await axios.post(
-      "https://simpleapi-p29y.onrender.com/teacher/auth",
-      req,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+    if(validateEmail(email.current.value)&&validateName(sp.current.value) && validateName(fname.current.value) && validatepassword(p.current.value) && validateName(lname.current.value) ){
+      res = await axios.post(
+        "https://simpleapi-p29y.onrender.com/teacher/auth",
+        req,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      if (res.data.res ){
+      setIshedden((prevValue) => !prevValue)
+      } else {
+        toast.error(res.data.mes, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
-    );
+
+
+    }else{
+      toast.error("Check your information", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    }
+    
+
+    
   }
   async function send() {
     let res;
@@ -68,7 +90,7 @@ export default function Signup(params) {
       sex: company.current.value,
       email: email.current.value,
       password: p.current.value,
-      specialist: "informatique",
+      specialist: sp.current.value,
       code: code.current.value,
     };
     if (req.password == rp.current.value) {
@@ -81,13 +103,14 @@ export default function Signup(params) {
           },
         }
       );
-      console.log(res);
-      console.log(req);
+
       if (res.data.res) {
         navigate("/home", { state: req });
+      } else {
+        toast.error(res.data.mes, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
-    } else {
-      console.log("error");
     }
   }
   function validateEmail(email) {
@@ -330,7 +353,11 @@ export default function Signup(params) {
   }
   return (
     <div className="items-center justify-center flex">
-      <div className={`flex justify-center items-center flex-col ${isHidden?"hidden":""}`}>
+      <div
+        className={`flex justify-center items-center flex-col ${
+          isHidden ? "hidden" : ""
+        }`}
+      >
         <div className="relative z-0 mb-3 w-full group">
           <input
             type="text"
@@ -355,7 +382,7 @@ export default function Signup(params) {
           </button>
         </div>
       </div>
-      <div className={`w-5/6 md:w-3/5 ${isHidden?"":"hidden"}`}>
+      <div className={`w-5/6 md:w-3/5 ${isHidden ? "" : "hidden"}`}>
         <div
           className={`${state.err.hidden} flex p-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800`}
           role="alert"
@@ -387,25 +414,7 @@ export default function Signup(params) {
             Welcome,please entre details.
           </p>
         </div>
-        <div className="relative z-0 mb-3 w-full group">
-          <input
-            type="email"
-            name="floating_email"
-            ref={username}
-            onBlur={handleusername}
-            onChange={handleusername}
-            id="username"
-            className={`block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 ${state.validateusername[0]} appearance-none focus:outline-none focus:ring-0 peer`}
-            placeholder=" "
-            required
-          />
-          <label
-            htmlFor="floating_email"
-            className={`${state.validateusername[1]}`}
-          >
-            Username
-          </label>
-        </div>
+       
         <div className="relative z-0 mb-3 w-full group">
           <input
             type="email"
@@ -505,26 +514,11 @@ export default function Signup(params) {
           </div>
         </div>
         <div className="grid md:grid-cols-2 md:gap-6">
-          <div className="relative z-0 mb-3 w-full group">
-            <input
-              type="tel"
-              ref={tel}
-              onBlur={handletel}
-              pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-              name="floating_phone"
-              id="floating_phone"
-              className={state.validatetel[0]}
-              placeholder=" "
-              required
-            />
-            <label htmlFor="floating_phone" className={state.validatetel[1]}>
-              Phone number
-            </label>
-          </div>
+          
           <div className="relative z-0 mb-3 w-full group">
             <input
               type="text"
-              ref={company}
+              ref={sp}
               name="floating_company"
               id="floating_company"
               className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -535,14 +529,23 @@ export default function Signup(params) {
               htmlFor="floating_company"
               className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
             >
-              Company
+              specialist
             </label>
+          </div>
+          <div>
+        
+          <select ref={company} id="underline_select" class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+
+              <option value="Male">Male</option>
+            <option value="Fimale">Fmail</option>
+          </select>
           </div>
         </div>
         <button
-          onClick={()=>{
-            sendCode()
-            setIshedden(prev=>!prev)
+          onClick={() => {
+            sendCode();
+
+
           }}
           className="w-full mt-6 mb-3 bg-purple-500 rounded-md h-10 text-white font-serif"
         >

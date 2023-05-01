@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getData } from "google-token-decode";
 import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
-import { toast, ToastPromiseParams } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { wait } from "@testing-library/user-event/dist/utils";
 
@@ -21,12 +21,7 @@ export default function Signin() {
 
   async function send() {
   
-    // toast.update(toastId, {
-    //   render: "New content",
-    //   type: toast.TYPE.DEFAULT,
-    //   autoClose: 5000,
-    // });
-    const resolveAfter3Sec = new Promise(resolve => setTimeout(resolve, 3000));
+   
 
     
     let req;
@@ -62,7 +57,7 @@ export default function Signin() {
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
       getData(tokenResponse.access_token, (err, data) => {
-        // your logic here
+        
         if (err) {
           return false;
         }
@@ -127,7 +122,7 @@ export default function Signin() {
         </div>
         <div className="relative z-0 mb-6 w-full group">
           <input
-            type={"text"}
+            type={"email"}
             ref={emailuser}
             onChange={handle}
             name="floating_email"
